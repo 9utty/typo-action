@@ -4,6 +4,10 @@
 
 [![NPM](https://img.shields.io/npm/v/typo-action.svg)](https://www.npmjs.com/package/typo-action) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+## Execute
+
+<img src="https://user-images.githubusercontent.com/86397600/254705149-0690f3eb-31c9-4913-9264-c623e01b5fa6.gif">
+
 ## Install
 
 ```bash
