@@ -156,6 +156,7 @@ var TypoAction = function TypoAction(_ref) {
     }
   }, cursorText));
 };
+var MemoizedTypoAction = /*#__PURE__*/React.memo(TypoAction);
 
-export default TypoAction;
+export default MemoizedTypoAction;
 //# sourceMappingURL=index.modern.js.map

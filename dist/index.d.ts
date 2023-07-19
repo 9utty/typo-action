@@ -10,5 +10,5 @@ interface TypoActionProps {
     delay?: number;
     speed?: number;
 }
-declare const TypoAction: React.FC<TypoActionProps>;
-export default TypoAction;
+declare const MemoizedTypoAction: React.NamedExoticComponent<TypoActionProps>;
+export default MemoizedTypoAction;
