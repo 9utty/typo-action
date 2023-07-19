@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react'
 
 interface TypoActionProps {
@@ -178,5 +179,6 @@ const TypoAction: React.FC<TypoActionProps> = ({
     </span>
   )
 }
+const MemoizedTypoAction = React.memo(TypoAction)
 
-export default TypoAction
+export default MemoizedTypoAction
