@@ -53,45 +53,15 @@ const TypoAction: React.FC<TypoActionProps> = ({
       const rect = textRef.current.getBoundingClientRect()
       const elemTop = rect.top
       const isVisible = elemTop <= windowHeight
+      const isOutOfThreshold = elemTop <= windowHeight - 150
 
       if (isVisible && !animationPlayed) {
-        if (delay !== 0) {
-          setTimeout(() => {
-            setDisplayedText('')
-            let index = 0
-            const interval = setInterval(() => {
-              if (index < text.length) {
-                setDisplayedText((displayText) => {
-                  if (displayText.length < text.length) {
-                    return text.slice(0, index + 1)
-                  }
-                  return displayText
-                })
-                index++
-              } else {
-                clearInterval(interval)
-              }
-            }, speed)
-          }, delay)
-        } else {
-          setDisplayedText('')
-          let index = 0
-          const interval = setInterval(() => {
-            if (index < text.length) {
-              setDisplayedText((displayText) => {
-                if (displayText.length < text.length) {
-                  return text.slice(0, index + 1)
-                }
-                return displayText
-              })
-              index++
-            } else {
-              clearInterval(interval)
-            }
-          }, speed)
-        }
-        setAnimationPlayed(true)
-      } else if (!isVisible && animationPlayed) {
+        // ...
+      } else if (
+        isOutOfThreshold &&
+        animationPlayed &&
+        displayedText.length === text.length
+      ) {
         let reversedIndex = text.length
         const reversedInterval = setInterval(() => {
           if (reversedIndex > -1) {
