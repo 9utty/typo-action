@@ -13,6 +13,8 @@ var TypoAction = function TypoAction(_ref) {
     cursorView = _ref$cursorView === void 0 ? true : _ref$cursorView,
     _ref$cursorColor = _ref.cursorColor,
     cursorColor = _ref$cursorColor === void 0 ? 'white' : _ref$cursorColor,
+    _ref$delay = _ref.delay,
+    delay = _ref$delay === void 0 ? 0 : _ref$delay,
     _ref$speed = _ref.speed,
     speed = _ref$speed === void 0 ? 100 : _ref$speed;
   var _useState = useState(''),
@@ -24,6 +26,15 @@ var TypoAction = function TypoAction(_ref) {
   var _useState3 = useState(1),
     cursorOpacity = _useState3[0],
     setCursorOpacity = _useState3[1];
+  var _useState4 = useState(null),
+    intervalId = _useState4[0],
+    setIntervalId = _useState4[1];
+  var _useState5 = useState(false),
+    playing = _useState5[0],
+    setPlaying = _useState5[1];
+  var _useState6 = useState(false),
+    isVisible = _useState6[0],
+    setIsVisible = _useState6[1];
   var textRef = useRef(null);
   var applyPointText = function applyPointText(inputText) {
     if (pointText) {
@@ -38,58 +49,110 @@ var TypoAction = function TypoAction(_ref) {
     }
     return inputText;
   };
-  var handleScroll = function handleScroll() {
-    if (textRef.current) {
-      var windowHeight = 'innerHeight' in window ? window.innerHeight : document.documentElement.offsetHeight;
-      var rect = textRef.current.getBoundingClientRect();
-      var elemTop = rect.top;
-      var isVisible = elemTop <= windowHeight;
-      var isOutOfThreshold = elemTop <= windowHeight - 150;
-      if (isVisible && !animationPlayed) ; else if (isOutOfThreshold && animationPlayed && displayedText.length === text.length) {
-        var reversedIndex = text.length;
-        var reversedInterval = setInterval(function () {
-          if (reversedIndex > -1) {
+  var handleScroll = function handleScroll(callback) {
+    if (playing) return;
+    if (!animationPlayed && displayedText.length < text.length) {
+      var index = 0;
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+      }
+      var startAnimation = function startAnimation() {
+        var interval = setInterval(function () {
+          if (index < text.length) {
             setDisplayedText(function (displayText) {
-              if (displayText.length > 0) {
-                return text.slice(0, reversedIndex);
-              }
-              return displayText;
+              return text.slice(0, ++index);
             });
-            reversedIndex--;
           } else {
-            clearInterval(reversedInterval);
+            clearInterval(interval);
+            setIntervalId(null);
+            callback();
           }
         }, speed);
-        setAnimationPlayed(false);
+        setIntervalId(interval);
+      };
+      if (delay !== 0) {
+        setTimeout(startAnimation, delay);
+      } else {
+        startAnimation();
       }
+      setAnimationPlayed(true);
+      setPlaying(true);
     }
   };
+  var reversedAnimation = function reversedAnimation(callback) {
+    if (playing) return;
+    var reversedIndex = text.length;
+    if (intervalId !== null) {
+      clearInterval(intervalId);
+    }
+    var reversedInterval = setInterval(function () {
+      if (reversedIndex > -1) {
+        setDisplayedText(function (displayText) {
+          if (displayText.length > 0) {
+            return text.slice(0, reversedIndex);
+          }
+          return displayText;
+        });
+        reversedIndex--;
+      } else {
+        clearInterval(reversedInterval);
+        setIntervalId(null);
+        callback();
+      }
+    }, speed);
+    setIntervalId(reversedInterval);
+    setPlaying(true);
+  };
   useEffect(function () {
-    window.addEventListener('scroll', handleScroll);
+    var observer = new IntersectionObserver(function (entries) {
+      setIsVisible(entries[0].isIntersecting);
+    }, {
+      threshold: 1
+    });
+    if (textRef.current) {
+      observer.observe(textRef.current);
+    }
     return function () {
-      window.removeEventListener('scroll', handleScroll);
+      if (textRef.current) {
+        observer.unobserve(textRef.current);
+      }
+    };
+  }, [textRef]);
+  useEffect(function () {
+    if (isVisible) {
+      if (!animationPlayed && displayedText.length < text.length) {
+        handleScroll(function () {
+          setPlaying(false);
+          setAnimationPlayed(true);
+        });
+      }
+    } else {
+      if (animationPlayed && displayedText.length === text.length) {
+        reversedAnimation(function () {
+          setPlaying(false);
+          setAnimationPlayed(false);
+        });
+      }
+    }
+  }, [isVisible]);
+  useEffect(function () {
+    var cursorInterval = setInterval(function () {
+      setCursorOpacity(function (state) {
+        return state === 0 ? 1 : 0;
+      });
+    }, 500);
+    return function () {
+      clearInterval(cursorInterval);
     };
   }, []);
-  useEffect(function () {
-    if (cursorView) {
-      var cursorInterval = setInterval(function () {
-        setCursorOpacity(function (prevCursorOpacity) {
-          return 1 - prevCursorOpacity;
-        });
-      }, 500);
-      return function () {
-        clearInterval(cursorInterval);
-      };
-    }
-  }, [cursorView]);
   return /*#__PURE__*/React.createElement("span", {
     className: className,
     ref: textRef
-  }, applyPointText(displayedText), /*#__PURE__*/React.createElement("span", {
+  }, applyPointText(displayedText), cursorView && /*#__PURE__*/React.createElement("span", {
     style: {
-      marginLeft: '2px',
-      color: cursorColor,
-      opacity: cursorOpacity
+      opacity: cursorOpacity,
+      paddingLeft: '3px',
+      color: cursorColor
     }
   }, cursorText));
 };
