@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 
 interface TypoActionProps {
   text: string
-  pointText: string
+  pointText?: string
   className?: string
   pointColor?: string
   cursorText?: string
@@ -26,15 +26,17 @@ const TypoAction: React.FC<TypoActionProps> = ({
   const textRef = useRef<HTMLSpanElement>(null)
 
   const applyPointText = (inputText: string) => {
-    const targetIndex = inputText.indexOf(pointText)
-    if (targetIndex !== -1) {
-      return (
-        <>
-          {inputText.slice(0, targetIndex)}
-          <span style={{ color: pointColor }}>{pointText}</span>
-          {inputText.slice(targetIndex + pointText.length)}
-        </>
-      )
+    if (pointText) {
+      const targetIndex = inputText.indexOf(pointText)
+      if (targetIndex !== -1) {
+        return (
+          <>
+            {inputText.slice(0, targetIndex)}
+            <span style={{ color: pointColor }}>{pointText}</span>
+            {inputText.slice(targetIndex + pointText.length)}
+          </>
+        )
+      }
     }
     return inputText
   }
