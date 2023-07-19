@@ -23,9 +23,14 @@ const TypoAction: React.FC<TypoActionProps> = ({
   delay = 0,
   speed = 100
 }) => {
-  const [displayedText, setDisplayedText] = useState('')
-  const [animationPlayed, setAnimationPlayed] = useState(false)
-  const [cursorOpacity, setCursorOpacity] = useState(1)
+  const [displayedText, setDisplayedText] = useState<string>('')
+  const [animationPlayed, setAnimationPlayed] = useState<boolean>(false)
+  const [cursorOpacity, setCursorOpacity] = useState<number>(1)
+  const [intervalId, setIntervalId] = useState<ReturnType<
+    typeof setInterval
+  > | null>(null)
+  const [playing, setPlaying] = useState<boolean>(false)
+  const [isVisible, setIsVisible] = useState<boolean>(false)
   const textRef = useRef<HTMLSpanElement>(null)
 
   const applyPointText = (inputText: string) => {
@@ -44,73 +49,132 @@ const TypoAction: React.FC<TypoActionProps> = ({
     return inputText
   }
 
-  const handleScroll = () => {
-    if (textRef.current) {
-      const windowHeight =
-        'innerHeight' in window
-          ? window.innerHeight
-          : document.documentElement.offsetHeight
-      const rect = textRef.current.getBoundingClientRect()
-      const elemTop = rect.top
-      const isVisible = elemTop <= windowHeight
-      const isOutOfThreshold = elemTop <= windowHeight - 150
+  const handleScroll = (callback: () => void) => {
+    if (playing) return
 
-      if (isVisible && !animationPlayed) {
-        // ...
-      } else if (
-        isOutOfThreshold &&
-        animationPlayed &&
-        displayedText.length === text.length
-      ) {
-        let reversedIndex = text.length
-        const reversedInterval = setInterval(() => {
-          if (reversedIndex > -1) {
-            setDisplayedText((displayText) => {
-              if (displayText.length > 0) {
-                return text.slice(0, reversedIndex)
-              }
-              return displayText
-            })
-            reversedIndex--
+    if (!animationPlayed && displayedText.length < text.length) {
+      let index = 0
+
+      if (intervalId !== null) {
+        clearInterval(intervalId)
+      }
+
+      const startAnimation = () => {
+        const interval = setInterval(() => {
+          if (index < text.length) {
+            setDisplayedText((displayText) => text.slice(0, ++index))
           } else {
-            clearInterval(reversedInterval)
+            clearInterval(interval)
+            setIntervalId(null)
+            callback()
           }
         }, speed)
-        setAnimationPlayed(false)
+        setIntervalId(interval)
       }
+
+      if (delay !== 0) {
+        setTimeout(startAnimation, delay)
+      } else {
+        startAnimation()
+      }
+
+      setAnimationPlayed(true)
+      setPlaying(true)
     }
   }
 
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
+  const reversedAnimation = (callback: () => void) => {
+    if (playing) return
+
+    let reversedIndex = text.length
+
+    if (intervalId !== null) {
+      clearInterval(intervalId)
     }
-  }, [])
+
+    const reversedInterval = setInterval(() => {
+      if (reversedIndex > -1) {
+        setDisplayedText((displayText) => {
+          if (displayText.length > 0) {
+            return text.slice(0, reversedIndex)
+          }
+          return displayText
+        })
+        reversedIndex--
+      } else {
+        clearInterval(reversedInterval)
+        setIntervalId(null)
+        callback()
+      }
+    }, speed)
+    setIntervalId(reversedInterval)
+
+    setPlaying(true)
+  }
 
   useEffect(() => {
-    if (cursorView) {
-      const cursorInterval = setInterval(() => {
-        setCursorOpacity((prevCursorOpacity) => 1 - prevCursorOpacity)
-      }, 500)
-      return () => {
-        clearInterval(cursorInterval)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        setIsVisible(entries[0].isIntersecting)
+      },
+      {
+        threshold: 1
+      }
+    )
+
+    if (textRef.current) {
+      observer.observe(textRef.current)
+    }
+
+    return () => {
+      if (textRef.current) {
+        observer.unobserve(textRef.current)
       }
     }
-  }, [cursorView])
+  }, [textRef])
+
+  useEffect(() => {
+    if (isVisible) {
+      if (!animationPlayed && displayedText.length < text.length) {
+        handleScroll(() => {
+          setPlaying(false)
+          setAnimationPlayed(true) // 상태 추가
+        })
+      }
+    } else {
+      if (animationPlayed && displayedText.length === text.length) {
+        reversedAnimation(() => {
+          setPlaying(false)
+          setAnimationPlayed(false) // 상태 추가
+        })
+      }
+    }
+  }, [isVisible])
+
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setCursorOpacity((state) => (state === 0 ? 1 : 0))
+    }, 500)
+
+    return () => {
+      clearInterval(cursorInterval)
+    }
+  }, [])
 
   return (
     <span className={className} ref={textRef}>
       {applyPointText(displayedText)}
-      <span
-        style={{
-          marginLeft: '2px',
-          color: cursorColor,
-          opacity: cursorOpacity
-        }}
-      >
-        {cursorText}
-      </span>
+      {cursorView && (
+        <span
+          style={{
+            opacity: cursorOpacity,
+            paddingLeft: '3px',
+            color: cursorColor
+          }}
+        >
+          {cursorText}
+        </span>
+      )}
     </span>
   )
 }

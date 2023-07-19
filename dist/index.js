@@ -16,8 +16,6 @@ var TypoAction = function TypoAction(_ref) {
     cursorView = _ref$cursorView === void 0 ? true : _ref$cursorView,
     _ref$cursorColor = _ref.cursorColor,
     cursorColor = _ref$cursorColor === void 0 ? 'white' : _ref$cursorColor,
-    _ref$delay = _ref.delay,
-    delay = _ref$delay === void 0 ? 0 : _ref$delay,
     _ref$speed = _ref.speed,
     speed = _ref$speed === void 0 ? 100 : _ref$speed;
   var _useState = React.useState(''),
@@ -49,44 +47,8 @@ var TypoAction = function TypoAction(_ref) {
       var rect = textRef.current.getBoundingClientRect();
       var elemTop = rect.top;
       var isVisible = elemTop <= windowHeight;
-      if (isVisible && !animationPlayed) {
-        if (delay !== 0) {
-          setTimeout(function () {
-            setDisplayedText('');
-            var index = 0;
-            var interval = setInterval(function () {
-              if (index < text.length) {
-                setDisplayedText(function (displayText) {
-                  if (displayText.length < text.length) {
-                    return text.slice(0, index + 1);
-                  }
-                  return displayText;
-                });
-                index++;
-              } else {
-                clearInterval(interval);
-              }
-            }, speed);
-          }, delay);
-        } else {
-          setDisplayedText('');
-          var index = 0;
-          var interval = setInterval(function () {
-            if (index < text.length) {
-              setDisplayedText(function (displayText) {
-                if (displayText.length < text.length) {
-                  return text.slice(0, index + 1);
-                }
-                return displayText;
-              });
-              index++;
-            } else {
-              clearInterval(interval);
-            }
-          }, speed);
-        }
-        setAnimationPlayed(true);
-      } else if (!isVisible && animationPlayed) {
+      var isOutOfThreshold = elemTop <= windowHeight - 150;
+      if (isVisible && !animationPlayed) ; else if (isOutOfThreshold && animationPlayed && displayedText.length === text.length) {
         var reversedIndex = text.length;
         var reversedInterval = setInterval(function () {
           if (reversedIndex > -1) {
