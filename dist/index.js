@@ -5,7 +5,8 @@ var React__default = _interopDefault(React);
 
 var TypoAction = function TypoAction(_ref) {
   var text = _ref.text,
-    pointText = _ref.pointText,
+    _ref$pointText = _ref.pointText,
+    pointText = _ref$pointText === void 0 ? '' : _ref$pointText,
     className = _ref.className,
     _ref$pointColor = _ref.pointColor,
     pointColor = _ref$pointColor === void 0 ? 'red' : _ref$pointColor,
@@ -13,6 +14,8 @@ var TypoAction = function TypoAction(_ref) {
     cursorText = _ref$cursorText === void 0 ? '|' : _ref$cursorText,
     _ref$cursorView = _ref.cursorView,
     cursorView = _ref$cursorView === void 0 ? true : _ref$cursorView,
+    _ref$cursorColor = _ref.cursorColor,
+    cursorColor = _ref$cursorColor === void 0 ? 'white' : _ref$cursorColor,
     _ref$delay = _ref.delay,
     delay = _ref$delay === void 0 ? 0 : _ref$delay,
     _ref$speed = _ref.speed,
@@ -20,9 +23,12 @@ var TypoAction = function TypoAction(_ref) {
   var _useState = React.useState(''),
     displayedText = _useState[0],
     setDisplayedText = _useState[1];
-  var _useState2 = React.useState(cursorView),
-    showCursor = _useState2[0],
-    setShowCursor = _useState2[1];
+  var _useState2 = React.useState(false),
+    animationPlayed = _useState2[0],
+    setAnimationPlayed = _useState2[1];
+  var _useState3 = React.useState(1),
+    cursorOpacity = _useState3[0],
+    setCursorOpacity = _useState3[1];
   var textRef = React.useRef(null);
   var applyPointText = function applyPointText(inputText) {
     if (pointText) {
@@ -43,35 +49,59 @@ var TypoAction = function TypoAction(_ref) {
       var rect = textRef.current.getBoundingClientRect();
       var elemTop = rect.top;
       var isVisible = elemTop <= windowHeight;
-      var playTextAnimation = function playTextAnimation() {
-        var index = 0;
-        var interval = setInterval(function () {
-          if (index < text.length) {
-            setDisplayedText(text.substring(0, index + 1));
-            index++;
-          } else {
-            clearInterval(interval);
-          }
-        }, speed);
-      };
-      if (isVisible) {
+      if (isVisible && !animationPlayed) {
         if (delay !== 0) {
           setTimeout(function () {
-            playTextAnimation();
+            setDisplayedText('');
+            var index = 0;
+            var interval = setInterval(function () {
+              if (index < text.length) {
+                setDisplayedText(function (displayText) {
+                  if (displayText.length < text.length) {
+                    return text.slice(0, index + 1);
+                  }
+                  return displayText;
+                });
+                index++;
+              } else {
+                clearInterval(interval);
+              }
+            }, speed);
           }, delay);
         } else {
-          playTextAnimation();
+          setDisplayedText('');
+          var index = 0;
+          var interval = setInterval(function () {
+            if (index < text.length) {
+              setDisplayedText(function (displayText) {
+                if (displayText.length < text.length) {
+                  return text.slice(0, index + 1);
+                }
+                return displayText;
+              });
+              index++;
+            } else {
+              clearInterval(interval);
+            }
+          }, speed);
         }
-      } else {
+        setAnimationPlayed(true);
+      } else if (!isVisible && animationPlayed) {
         var reversedIndex = text.length;
         var reversedInterval = setInterval(function () {
           if (reversedIndex > -1) {
-            setDisplayedText(text.substring(0, reversedIndex));
+            setDisplayedText(function (displayText) {
+              if (displayText.length > 0) {
+                return text.slice(0, reversedIndex);
+              }
+              return displayText;
+            });
             reversedIndex--;
           } else {
             clearInterval(reversedInterval);
           }
         }, speed);
+        setAnimationPlayed(false);
       }
     }
   };
@@ -80,14 +110,14 @@ var TypoAction = function TypoAction(_ref) {
     return function () {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [displayedText]);
+  }, []);
   React.useEffect(function () {
     if (cursorView) {
       var cursorInterval = setInterval(function () {
-        setShowCursor(function (prevShowCursor) {
-          return !prevShowCursor;
+        setCursorOpacity(function (prevCursorOpacity) {
+          return 1 - prevCursorOpacity;
         });
-      }, 1000);
+      }, 500);
       return function () {
         clearInterval(cursorInterval);
       };
@@ -97,10 +127,10 @@ var TypoAction = function TypoAction(_ref) {
     className: className,
     ref: textRef
   }, applyPointText(displayedText), /*#__PURE__*/React__default.createElement("span", {
-    style: showCursor ? {
-      marginLeft: '2px'
-    } : {
-      display: 'none'
+    style: {
+      marginLeft: '2px',
+      color: cursorColor,
+      opacity: cursorOpacity
     }
   }, cursorText));
 };

@@ -6,6 +6,7 @@ interface TypoActionProps {
     pointColor?: string;
     cursorText?: string;
     cursorView?: boolean;
+    cursorColor?: string;
     delay?: number;
     speed?: number;
 }

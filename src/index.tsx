@@ -7,22 +7,25 @@ interface TypoActionProps {
   pointColor?: string
   cursorText?: string
   cursorView?: boolean
+  cursorColor?: string
   delay?: number
   speed?: number
 }
 
 const TypoAction: React.FC<TypoActionProps> = ({
   text,
-  pointText,
+  pointText = '',
   className,
   pointColor = 'red',
   cursorText = '|',
   cursorView = true,
+  cursorColor = 'white',
   delay = 0,
   speed = 100
 }) => {
   const [displayedText, setDisplayedText] = useState('')
-  const [showCursor, setShowCursor] = useState(cursorView)
+  const [animationPlayed, setAnimationPlayed] = useState(false)
+  const [cursorOpacity, setCursorOpacity] = useState(1)
   const textRef = useRef<HTMLSpanElement>(null)
 
   const applyPointText = (inputText: string) => {
@@ -51,38 +54,59 @@ const TypoAction: React.FC<TypoActionProps> = ({
       const elemTop = rect.top
       const isVisible = elemTop <= windowHeight
 
-      const playTextAnimation = () => {
-        let index = 0
-        const interval = setInterval(() => {
-          if (index < text.length) {
-            setDisplayedText(text.substring(0, index + 1))
-            index++
-          } else {
-            clearInterval(interval)
-          }
-        }, speed)
-      }
-
-      if (isVisible) {
-        // 화면 내에 들어오면, 텍스트 애니메이션 재생
+      if (isVisible && !animationPlayed) {
         if (delay !== 0) {
           setTimeout(() => {
-            playTextAnimation()
+            setDisplayedText('')
+            let index = 0
+            const interval = setInterval(() => {
+              if (index < text.length) {
+                setDisplayedText((displayText) => {
+                  if (displayText.length < text.length) {
+                    return text.slice(0, index + 1)
+                  }
+                  return displayText
+                })
+                index++
+              } else {
+                clearInterval(interval)
+              }
+            }, speed)
           }, delay)
         } else {
-          playTextAnimation()
+          setDisplayedText('')
+          let index = 0
+          const interval = setInterval(() => {
+            if (index < text.length) {
+              setDisplayedText((displayText) => {
+                if (displayText.length < text.length) {
+                  return text.slice(0, index + 1)
+                }
+                return displayText
+              })
+              index++
+            } else {
+              clearInterval(interval)
+            }
+          }, speed)
         }
-      } else {
-        // 화면 밖에 있으면, 텍스트 애니메이션 역재생
+        setAnimationPlayed(true)
+      } else if (!isVisible && animationPlayed) {
         let reversedIndex = text.length
         const reversedInterval = setInterval(() => {
           if (reversedIndex > -1) {
-            setDisplayedText(text.substring(0, reversedIndex))
+            setDisplayedText((displayText) => {
+              if (displayText.length > 0) {
+                return text.slice(0, reversedIndex)
+              }
+              return displayText
+            })
             reversedIndex--
           } else {
             clearInterval(reversedInterval)
           }
         }, speed)
+        setAnimationPlayed(false)
       }
     }
   }
@@ -92,13 +116,13 @@ const TypoAction: React.FC<TypoActionProps> = ({
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [displayedText])
+  }, [])
 
   useEffect(() => {
     if (cursorView) {
       const cursorInterval = setInterval(() => {
-        setShowCursor((prevShowCursor) => !prevShowCursor)
-      }, 1000)
+        setCursorOpacity((prevCursorOpacity) => 1 - prevCursorOpacity)
+      }, 500)
       return () => {
         clearInterval(cursorInterval)
       }
@@ -108,7 +132,13 @@ const TypoAction: React.FC<TypoActionProps> = ({
   return (
     <span className={className} ref={textRef}>
       {applyPointText(displayedText)}
-      <span style={showCursor ? { marginLeft: '2px' } : { display: 'none' }}>
+      <span
+        style={{
+          marginLeft: '2px',
+          color: cursorColor,
+          opacity: cursorOpacity
+        }}
+      >
         {cursorText}
       </span>
     </span>
