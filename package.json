@@ -1,6 +1,6 @@
 {
   "name": "typo-action",
-  "version": "1.1.0",
+  "version": "1.1.4",
   "description": "UI library for animating React typography and playing and reversing animations based on scrolling events.",
   "author": "9utty",
   "license": "MIT",

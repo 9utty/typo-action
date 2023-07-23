@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState, useRef } from 'react'
+import Cursor from './Cursor'
 
 interface TypoActionProps {
   text: string
@@ -26,7 +26,6 @@ const TypoAction: React.FC<TypoActionProps> = ({
 }) => {
   const [displayedText, setDisplayedText] = useState<string>('')
   const [animationPlayed, setAnimationPlayed] = useState<boolean>(false)
-  const [cursorOpacity, setCursorOpacity] = useState<number>(1)
   const [intervalId, setIntervalId] = useState<ReturnType<
     typeof setInterval
   > | null>(null)
@@ -152,33 +151,14 @@ const TypoAction: React.FC<TypoActionProps> = ({
     }
   }, [isVisible])
 
-  useEffect(() => {
-    const cursorInterval = setInterval(() => {
-      setCursorOpacity((state) => (state === 0 ? 1 : 0))
-    }, 500)
-
-    return () => {
-      clearInterval(cursorInterval)
-    }
-  }, [])
-
   return (
     <span className={className} ref={textRef}>
       {applyPointText(displayedText)}
       {cursorView && (
-        <span
-          style={{
-            opacity: cursorOpacity,
-            paddingLeft: '3px',
-            color: cursorColor
-          }}
-        >
-          {cursorText}
-        </span>
+        <Cursor cursorText={cursorText} cursorColor={cursorColor} />
       )}
     </span>
   )
 }
-const MemoizedTypoAction = React.memo(TypoAction)
 
-export default MemoizedTypoAction
+export default TypoAction
