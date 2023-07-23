@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react'
-import Cursor from './Cursor'
 
 interface TypoActionProps {
   text: string
@@ -174,7 +173,15 @@ const TypoAction: React.FC<TypoActionProps> = ({
     <span className={className} ref={textRef}>
       {applyPointText(displayedText)}
       {cursorView && (
-        <Cursor cursorText={cursorText} cursorColor={cursorColor} />
+        <span
+          className='cursor'
+          style={{
+            paddingLeft: '3px',
+            color: cursorColor
+          }}
+        >
+          {cursorText}
+        </span>
       )}
     </span>
   )

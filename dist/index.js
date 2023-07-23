@@ -8,22 +8,9 @@ var Cursor = function Cursor(_ref) {
     cursorText = _ref$cursorText === void 0 ? '|' : _ref$cursorText,
     _ref$cursorColor = _ref.cursorColor,
     cursorColor = _ref$cursorColor === void 0 ? 'white' : _ref$cursorColor;
-  var _useState = React$1.useState(1),
-    cursorOpacity = _useState[0],
-    setCursorOpacity = _useState[1];
-  React$1.useEffect(function () {
-    var cursorInterval = setInterval(function () {
-      setCursorOpacity(function (state) {
-        return state === 0 ? 1 : 0;
-      });
-    }, 500);
-    return function () {
-      clearInterval(cursorInterval);
-    };
-  }, []);
   return /*#__PURE__*/React.createElement("span", {
+    className: "cursor",
     style: {
-      opacity: cursorOpacity,
       paddingLeft: '3px',
       color: cursorColor
     }
