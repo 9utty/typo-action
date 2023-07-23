@@ -1,9 +1,5 @@
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
-var React = require('react');
-var React__default = _interopDefault(React);
-var styled = require('styled-components');
-var styled__default = _interopDefault(styled);
+import React, { useState, useRef, useEffect } from 'react';
+import styled, { keyframes } from 'styled-components';
 
 function _taggedTemplateLiteralLoose(strings, raw) {
   if (!raw) {
@@ -31,27 +27,27 @@ var TypoAction = function TypoAction(_ref) {
     delay = _ref$delay === void 0 ? 0 : _ref$delay,
     _ref$speed = _ref.speed,
     speed = _ref$speed === void 0 ? 100 : _ref$speed;
-  var _useState = React.useState(""),
+  var _useState = useState(""),
     displayedText = _useState[0],
     setDisplayedText = _useState[1];
-  var _useState2 = React.useState(false),
+  var _useState2 = useState(false),
     animationPlayed = _useState2[0],
     setAnimationPlayed = _useState2[1];
-  var _useState3 = React.useState(null),
+  var _useState3 = useState(null),
     intervalId = _useState3[0],
     setIntervalId = _useState3[1];
-  var _useState4 = React.useState(false),
+  var _useState4 = useState(false),
     playing = _useState4[0],
     setPlaying = _useState4[1];
-  var _useState5 = React.useState(false),
+  var _useState5 = useState(false),
     isVisible = _useState5[0],
     setIsVisible = _useState5[1];
-  var textRef = React.useRef(null);
+  var textRef = useRef(null);
   var applyPointText = function applyPointText(inputText) {
     if (pointText) {
       var targetIndex = inputText.indexOf(pointText);
       if (targetIndex !== -1) {
-        return /*#__PURE__*/React__default.createElement(Fragment, null, inputText.slice(0, targetIndex), /*#__PURE__*/React__default.createElement("span", {
+        return /*#__PURE__*/React.createElement(Fragment, null, inputText.slice(0, targetIndex), /*#__PURE__*/React.createElement("span", {
           style: {
             color: pointColor
           }
@@ -114,7 +110,7 @@ var TypoAction = function TypoAction(_ref) {
     setIntervalId(reversedInterval);
     setPlaying(true);
   };
-  React.useEffect(function () {
+  useEffect(function () {
     var observer = new IntersectionObserver(function (entries) {
       setIsVisible(entries[0].isIntersecting);
     }, {
@@ -129,7 +125,7 @@ var TypoAction = function TypoAction(_ref) {
       }
     };
   }, [textRef]);
-  React.useEffect(function () {
+  useEffect(function () {
     if (isVisible) {
       if (!animationPlayed && displayedText.length < text.length) {
         handleScroll(function () {
@@ -146,7 +142,7 @@ var TypoAction = function TypoAction(_ref) {
       }
     }
   }, [isVisible]);
-  React.useEffect(function () {
+  useEffect(function () {
     if (playing) return;
     if (isVisible) {
       if (!animationPlayed && displayedText.length < text.length) {
@@ -162,13 +158,13 @@ var TypoAction = function TypoAction(_ref) {
       }
     }
   }, [isVisible, animationPlayed]);
-  var blink = styled.keyframes(_templateObject || (_templateObject = _taggedTemplateLiteralLoose(["\n  0%, 100% {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0;\n  }\n"])));
-  var Cursor = styled__default.span(_templateObject2 || (_templateObject2 = _taggedTemplateLiteralLoose(["\n    animation: ", " 1s step-end infinite;\n    color: ", ";\n  "])), blink, cursorColor);
-  return /*#__PURE__*/React__default.createElement("span", {
+  var blink = keyframes(_templateObject || (_templateObject = _taggedTemplateLiteralLoose(["\n  0%, 100% {\n    opacity: 1;\n  }\n  50% {\n    opacity: 0;\n  }\n"])));
+  var Cursor = styled.span(_templateObject2 || (_templateObject2 = _taggedTemplateLiteralLoose(["\n    animation: ", " 1s step-end infinite;\n    color: ", ";\n  "])), blink, cursorColor);
+  return /*#__PURE__*/React.createElement("span", {
     className: className,
     ref: textRef
-  }, /*#__PURE__*/React__default.createElement("div", null), applyPointText(displayedText), cursorView && /*#__PURE__*/React__default.createElement(Cursor, null, cursorText));
+  }, /*#__PURE__*/React.createElement("div", null), applyPointText(displayedText), cursorView && /*#__PURE__*/React.createElement(Cursor, null, cursorText));
 };
 
-module.exports = TypoAction;
-//# sourceMappingURL=index.js.map
+export default TypoAction;
+//# sourceMappingURL=index.modern.js.map
