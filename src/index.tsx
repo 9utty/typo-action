@@ -151,6 +151,25 @@ const TypoAction: React.FC<TypoActionProps> = ({
     }
   }, [isVisible])
 
+  useEffect(() => {
+    if (playing) return
+
+    if (isVisible) {
+      if (!animationPlayed && displayedText.length < text.length) {
+        handleScroll(() => {
+          setPlaying(false)
+        })
+      }
+    } else {
+      if (animationPlayed && displayedText.length === text.length) {
+        reversedAnimation(() => {
+          setPlaying(false)
+        })
+      }
+    }
+    // animationPlayed가 변경되는 경우만 상태 업데이트와 관련된 효과를 다시 실행합니다.
+  }, [isVisible, animationPlayed])
+
   return (
     <span className={className} ref={textRef}>
       {applyPointText(displayedText)}

@@ -1,4 +1,31 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React$1, { useState, useEffect, useRef } from 'react';
+
+var Cursor = function Cursor(_ref) {
+  var _ref$cursorText = _ref.cursorText,
+    cursorText = _ref$cursorText === void 0 ? '|' : _ref$cursorText,
+    _ref$cursorColor = _ref.cursorColor,
+    cursorColor = _ref$cursorColor === void 0 ? 'white' : _ref$cursorColor;
+  var _useState = useState(1),
+    cursorOpacity = _useState[0],
+    setCursorOpacity = _useState[1];
+  useEffect(function () {
+    var cursorInterval = setInterval(function () {
+      setCursorOpacity(function (state) {
+        return state === 0 ? 1 : 0;
+      });
+    }, 500);
+    return function () {
+      clearInterval(cursorInterval);
+    };
+  }, []);
+  return /*#__PURE__*/React.createElement("span", {
+    style: {
+      opacity: cursorOpacity,
+      paddingLeft: '3px',
+      color: cursorColor
+    }
+  }, cursorText);
+};
 
 var TypoAction = function TypoAction(_ref) {
   var text = _ref.text,
@@ -23,24 +50,21 @@ var TypoAction = function TypoAction(_ref) {
   var _useState2 = useState(false),
     animationPlayed = _useState2[0],
     setAnimationPlayed = _useState2[1];
-  var _useState3 = useState(1),
-    cursorOpacity = _useState3[0],
-    setCursorOpacity = _useState3[1];
-  var _useState4 = useState(null),
-    intervalId = _useState4[0],
-    setIntervalId = _useState4[1];
+  var _useState3 = useState(null),
+    intervalId = _useState3[0],
+    setIntervalId = _useState3[1];
+  var _useState4 = useState(false),
+    playing = _useState4[0],
+    setPlaying = _useState4[1];
   var _useState5 = useState(false),
-    playing = _useState5[0],
-    setPlaying = _useState5[1];
-  var _useState6 = useState(false),
-    isVisible = _useState6[0],
-    setIsVisible = _useState6[1];
+    isVisible = _useState5[0],
+    setIsVisible = _useState5[1];
   var textRef = useRef(null);
   var applyPointText = function applyPointText(inputText) {
     if (pointText) {
       var targetIndex = inputText.indexOf(pointText);
       if (targetIndex !== -1) {
-        return /*#__PURE__*/React.createElement(Fragment, null, inputText.slice(0, targetIndex), /*#__PURE__*/React.createElement("span", {
+        return /*#__PURE__*/React$1.createElement(Fragment, null, inputText.slice(0, targetIndex), /*#__PURE__*/React$1.createElement("span", {
           style: {
             color: pointColor
           }
@@ -135,28 +159,14 @@ var TypoAction = function TypoAction(_ref) {
       }
     }
   }, [isVisible]);
-  useEffect(function () {
-    var cursorInterval = setInterval(function () {
-      setCursorOpacity(function (state) {
-        return state === 0 ? 1 : 0;
-      });
-    }, 500);
-    return function () {
-      clearInterval(cursorInterval);
-    };
-  }, []);
-  return /*#__PURE__*/React.createElement("span", {
+  return /*#__PURE__*/React$1.createElement("span", {
     className: className,
     ref: textRef
-  }, applyPointText(displayedText), cursorView && /*#__PURE__*/React.createElement("span", {
-    style: {
-      opacity: cursorOpacity,
-      paddingLeft: '3px',
-      color: cursorColor
-    }
-  }, cursorText));
+  }, applyPointText(displayedText), cursorView && /*#__PURE__*/React$1.createElement(Cursor, {
+    cursorText: cursorText,
+    cursorColor: cursorColor
+  }));
 };
-var MemoizedTypoAction = /*#__PURE__*/React.memo(TypoAction);
 
-export default MemoizedTypoAction;
+export default TypoAction;
 //# sourceMappingURL=index.modern.js.map
