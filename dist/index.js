@@ -162,6 +162,22 @@ var TypoAction = function TypoAction(_ref) {
       }
     }
   }, [isVisible]);
+  React$1.useEffect(function () {
+    if (playing) return;
+    if (isVisible) {
+      if (!animationPlayed && displayedText.length < text.length) {
+        handleScroll(function () {
+          setPlaying(false);
+        });
+      }
+    } else {
+      if (animationPlayed && displayedText.length === text.length) {
+        reversedAnimation(function () {
+          setPlaying(false);
+        });
+      }
+    }
+  }, [isVisible, animationPlayed]);
   return /*#__PURE__*/React$1__default.createElement("span", {
     className: className,
     ref: textRef
