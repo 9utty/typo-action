@@ -2,3 +2,4 @@ node_modules/
 example/
 *.log
 .git
+.DS_Store

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import './styles.module.css'
+import './index.css'
 
 interface TypoActionProps {
   text: string
