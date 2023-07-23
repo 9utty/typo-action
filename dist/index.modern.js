@@ -1,18 +1,4 @@
-import React$1, { useState, useRef, useEffect } from 'react';
-
-var Cursor = function Cursor(_ref) {
-  var _ref$cursorText = _ref.cursorText,
-    cursorText = _ref$cursorText === void 0 ? '|' : _ref$cursorText,
-    _ref$cursorColor = _ref.cursorColor,
-    cursorColor = _ref$cursorColor === void 0 ? 'white' : _ref$cursorColor;
-  return /*#__PURE__*/React.createElement("span", {
-    className: "cursor",
-    style: {
-      paddingLeft: '3px',
-      color: cursorColor
-    }
-  }, cursorText);
-};
+import React, { useState, useRef, useEffect } from 'react';
 
 var TypoAction = function TypoAction(_ref) {
   var text = _ref.text,
@@ -51,7 +37,7 @@ var TypoAction = function TypoAction(_ref) {
     if (pointText) {
       var targetIndex = inputText.indexOf(pointText);
       if (targetIndex !== -1) {
-        return /*#__PURE__*/React$1.createElement(Fragment, null, inputText.slice(0, targetIndex), /*#__PURE__*/React$1.createElement("span", {
+        return /*#__PURE__*/React.createElement(Fragment, null, inputText.slice(0, targetIndex), /*#__PURE__*/React.createElement("span", {
           style: {
             color: pointColor
           }
@@ -162,13 +148,16 @@ var TypoAction = function TypoAction(_ref) {
       }
     }
   }, [isVisible, animationPlayed]);
-  return /*#__PURE__*/React$1.createElement("span", {
+  return /*#__PURE__*/React.createElement("span", {
     className: className,
     ref: textRef
-  }, applyPointText(displayedText), cursorView && /*#__PURE__*/React$1.createElement(Cursor, {
-    cursorText: cursorText,
-    cursorColor: cursorColor
-  }));
+  }, applyPointText(displayedText), cursorView && /*#__PURE__*/React.createElement("span", {
+    className: "cursor",
+    style: {
+      paddingLeft: '3px',
+      color: cursorColor
+    }
+  }, cursorText));
 };
 
 export default TypoAction;
